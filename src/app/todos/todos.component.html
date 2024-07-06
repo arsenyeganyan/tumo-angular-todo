@@ -1,0 +1,70 @@
+<style>
+    input .border-0 {
+        all: unset;
+    }
+</style>
+<div class="container-sm border mt-3 pb-3" style="max-width: 900px">
+    <div class="input-group mt-3 mb-5 col">
+        <label class="control-label mb-1 fs-4" for="add-todo">Add your todo</label>
+        <div class="input-group">
+            <input 
+                #addInput
+                (keyup.enter)="onAddClick()"
+                [formControl] = "inputControl"
+                id="add-todo" 
+                type="text" 
+                class="form-control" placeholder="Recipient's username"
+                aria-label="Recipient's username" 
+                aria-describedby="button-addon2">
+            <button
+                (click)="onAddClick()" 
+                class="btn btn-outline-secondary" 
+                type="button" 
+                id="button-addon2">
+                Add
+            </button>
+        </div>
+    </div>
+    <div *ngIf="errMessages">
+        <div *ngIf="inputControl.hasError('required')">
+            Please enter a todo!
+        </div>
+        <div *ngIf="inputControl.hasError('minlength')">
+            Please enter at least 3 characters!
+        </div>
+    </div>
+    <div *ngIf="errText">
+        {{errText}}
+    </div>
+    <ul class="list-group">
+        <li *ngFor="let todo of todos; let index = index" class="list-group-item d-flex justify-content-between">
+            <div class="w-75">
+                <input 
+                    class="form-check-input me-2" 
+                    type="checkbox" 
+                    [(ngModel)]="todo.completed"
+                    id="firstCheckbox"
+                    (ngModelChange)="onCompleteChange(todo, index)"
+                >
+                <input 
+                    #editingInput 
+                    (keyup.enter)="onSaveClick(index, editingInput.value)"
+                    required 
+                    [class]="'border-0'" 
+                    [style]="'width: 90%;' + (todo.isEditing ? '' : 'outline: none; user-select: none;')" 
+                    type="text" 
+                    [readonly]="!todo.isEditing"
+                    [value]='todo.description'
+                >
+            </div>
+            <div *ngIf="!todo.isEditing">
+                <i (click)="onEditPanel(index); editingInput.focus();" class="bi bi-pen-fill d-inline-block me-2 hover-bg-dark"></i>
+                <i (click)="onDelete(index)" class="bi bi-trash"></i>
+            </div>
+            <div *ngIf="todo.isEditing">
+                <i (click)="onCancelClick(index)" class="bi bi-x-square d-inline-block me-2"></i>
+                <i (click)="onSaveClick(index, editingInput.value)" class="bi bi-floppy-fill "></i>
+            </div>
+        </li>
+    </ul>
+</div>
