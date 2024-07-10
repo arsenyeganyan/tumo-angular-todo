@@ -1,6 +1,5 @@
 import { Injectable } from "@angular/core";
 import { Todo } from "../models/todo";
-import { DOCUMENT } from "@angular/common";
 
 @Injectable({
     providedIn: 'root',
@@ -11,25 +10,43 @@ export class TodoService {
         localStorage.setItem('todos', JSON.stringify(todos));
     }
 
-    getAll(): Todo[] {
-        return JSON.parse(localStorage.getItem('todos') ?? '[]') as Todo[];
+    getAll(check?: boolean): Todo[] {
+        const allTodos = JSON.parse(localStorage.getItem('todos') ?? '[]') as Todo[];
+
+        if(check !== undefined) {
+            const filteredTodos = allTodos.filter(todo => todo.completed === check);
+    
+            return filteredTodos;
+        }
+
+        return allTodos;
     }
 
     add(todo: Todo): void {
-        let todos = this.getAll();
+        let todos = this.getAll(false);
         todos.unshift(todo);
         this.setAll(todos);
     }
 
-    delete(index: number): void {
+    delete(id: number): void {
         let todos = this.getAll();
+
+        const toDelete = todos.find(todo => todo.id === id);
+        const index = todos.findIndex(todo => todo.id == toDelete?.id);
+        
         todos.splice(index, 1);
         this.setAll(todos);
     }
 
-    save(index: number, edited: Todo): void {
+    save(edited: Todo): void {
         let todos = this.getAll();
+
+        const toEdit = todos.find(todo => todo.id === edited.id);
+        const index = todos.findIndex(todo => todo.id == toEdit?.id);
+        
         todos[index] = edited;
-        this.setAll(todos);
+            
+
+        this.setAll([...todos]);
     }
 }

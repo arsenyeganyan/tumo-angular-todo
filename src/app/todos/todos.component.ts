@@ -14,12 +14,13 @@ import { TodoService } from '../services/todo.service';
 
 export class TodosComponent {
   todos: Todo[] = [];
+  checkedTodos: Todo[] = [];
   errMessages = false;
   errText = '';
   isModelEditing = false;
 
   constructor(private todoService: TodoService) {
-    this.fetchTodos()
+    this.fetchTodos();
   }
 
   inputControl = new FormControl('', [Validators.required, Validators.minLength(3)])
@@ -27,6 +28,7 @@ export class TodosComponent {
   onAddClick() {
     if(this.inputControl.valid) {
       let todo: Todo = { 
+        id: Date.now(),
         description: this.inputControl.value || '', 
         completed: false,
         isEditing: false 
@@ -34,6 +36,7 @@ export class TodosComponent {
       this.todoService.add(todo);
       this.inputControl.setValue('');
       this.errMessages = false;
+      this.isModelEditing = false;
       this.fetchTodos();
     } 
     else {
@@ -41,9 +44,10 @@ export class TodosComponent {
     }
   }
 
-  onDelete(index: number) {
+  onDelete(todo: Todo) {
     if(confirm("Confirm changes?")) {
-      this.todoService.delete(index);
+      this.todoService.delete(todo.id);
+      this.isModelEditing = false;
       this.fetchTodos();
     }
   }
@@ -66,7 +70,7 @@ export class TodosComponent {
     const edited = this.todos[index];
     edited.isEditing = false;
     edited.description = editingValue;
-    this.todoService.save(index, edited);
+    this.todoService.save(edited);
     this.isModelEditing = false;
   }
 
@@ -78,11 +82,16 @@ export class TodosComponent {
   }
 
   onCompleteChange(todo: Todo, index: number): void {
-    this.todoService.save(index, todo);
+    this.todoService.save(todo);
+    this.isModelEditing = false;
     this.fetchTodos();
   }
 
   private fetchTodos(): void {
-    this.todos = this.todoService.getAll();
+    this.todos = this.todoService.getAll(false);
+    this.checkedTodos = this.todoService.getAll(true);
+    
+    console.log(this.todos);
+    console.log(this.checkedTodos);
   }
 }

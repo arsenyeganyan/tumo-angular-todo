@@ -36,7 +36,9 @@
     <div *ngIf="errText">
         {{errText}}
     </div>
-    <ul class="list-group">
+    <h5 >Due</h5>
+    <h6 *ngIf="todos.length === 0">No tasks due!</h6>
+    <ul class="list-group mb-3">
         <li *ngFor="let todo of todos; let index = index" class="list-group-item d-flex justify-content-between">
             <div class="w-75">
                 <input 
@@ -59,11 +61,36 @@
             </div>
             <div *ngIf="!todo.isEditing">
                 <i (click)="onEditPanel(index); editingInput.focus();" class="bi bi-pen-fill d-inline-block me-2 hover-bg-dark"></i>
-                <i (click)="onDelete(index)" class="bi bi-trash"></i>
+                <i (click)="onDelete(todo)" class="bi bi-trash"></i>
             </div>
             <div *ngIf="todo.isEditing">
                 <i (click)="onCancelClick(index)" class="bi bi-x-square d-inline-block me-2"></i>
                 <i (click)="onSaveClick(index, editingInput.value)" class="bi bi-floppy-fill "></i>
+            </div>
+        </li>
+    </ul>
+    <h5>Completed</h5>
+    <h6 *ngIf="checkedTodos.length === 0">No tasks completed yet!</h6>
+    <ul class="list-group">
+        <li *ngFor="let todo of checkedTodos; let index = index" class="list-group-item d-flex justify-content-between">
+            <div class="w-75">
+                <input 
+                    class="form-check-input me-2" 
+                    type="checkbox" 
+                    [(ngModel)]="todo.completed"
+                    id="firstCheckbox"
+                    (ngModelChange)="onCompleteChange(todo, index)"
+                >
+                <input 
+                    #editingInput 
+                    (keyup.enter)="onSaveClick(index, editingInput.value)"
+                    required 
+                    [class]="'border-0'" 
+                    [style]="'width: 90%;' + (todo.isEditing ? '' : 'outline: none; user-select: none;')" 
+                    type="text" 
+                    [readonly]="!todo.isEditing"
+                    [value]='todo.description'
+                >
             </div>
         </li>
     </ul>
